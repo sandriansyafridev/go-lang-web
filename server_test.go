@@ -8,18 +8,15 @@ import (
 
 func TestServerHTTP(t *testing.T) {
 
-	var homeHandler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-		// w.Write([]byte("Home page.")) // manual
-		fmt.Fprint(w, "Home")
-	}
+	mux := http.NewServeMux()
 
-	var aboutHandler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "About")
-	}
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Home page")
+	})
+	mux.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "About page")
+	})
 
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/about", aboutHandler)
-
-	http.ListenAndServe(":1234", nil)
+	http.ListenAndServe(":1234", mux)
 
 }
