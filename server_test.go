@@ -9,53 +9,62 @@ import (
 	"testing"
 )
 
-func testHandlerSingleQueryParams(w http.ResponseWriter, r *http.Request) {
-	queryParams_Name := r.URL.Query().Get("name")
-	fmt.Fprint(w, "Query Params Name: ", queryParams_Name)
+var target = "http://localhost:1234"
+
+func testHandlerCreateHeader(w http.ResponseWriter, r *http.Request) {
+
+	contentType_Header := r.Header.Get("content-type")
+	fmt.Fprint(w, "Content-Type: ", contentType_Header)
+
 }
 
-func testHandlerMultipleQueryParams(w http.ResponseWriter, r *http.Request) {
-	queryParams_Name := r.URL.Query().Get("name")
-	queryParams_Age := r.URL.Query().Get("age")
-	fmt.Fprintln(w, "Query Params Name: ", queryParams_Name)
-	fmt.Fprintln(w, "Query Params Age: ", queryParams_Age)
+func testHandlerGetHeader(w http.ResponseWriter, r *http.Request) {
+
+	w.Header().Add("x-user", "Sandrian Syafri")
+	fmt.Fprint(w, "TEST OK")
+
 }
 
-var targetSingleQueryParams = "http://localhost:1234/test-handler?name=Sandrian"
-var targetMultipleQueryParams = "http://localhost:1234/test-handler?name=Sandrian&age=18"
-
-func TestQueryParams(t *testing.T) {
+func TestCreateHeaderToServer(t *testing.T) {
 
 	//create http test
-	request := httptest.NewRequest("GET", targetSingleQueryParams, nil)
-	recorder := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, target, nil)
+	rec := httptest.NewRecorder()
 
-	//run test
-	testHandlerSingleQueryParams(recorder, request)
+	//add header
+	req.Header.Add("content-type", "application/json")
 
-	//get response test
-	response := recorder.Result()
-	body, _ := io.ReadAll(response.Body)
+	//process testing
+	testHandlerCreateHeader(rec, req)
 
-	//log  response test to console
+	//get response after test
+	res := rec.Result()
+	body, _ := io.ReadAll(res.Body)
+
+	//log to console
 	log.Println(string(body))
 
 }
 
-func TestMultipleQueryParams(t *testing.T) {
+func TestGetHeaderFromClient(t *testing.T) {
 
 	//create http test
-	request := httptest.NewRequest("GET", targetMultipleQueryParams, nil)
-	recorder := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, target, nil)
+	rec := httptest.NewRecorder()
 
-	//run test
-	testHandlerMultipleQueryParams(recorder, request)
+	//get header
 
-	//get response test
-	response := recorder.Result()
-	body, _ := io.ReadAll(response.Body)
+	//process testing
+	testHandlerGetHeader(rec, req)
 
-	//log  response test to console
+	//get response after test
+	res := rec.Result()
+	body, _ := io.ReadAll(res.Body)
+
+	xUser_Header := res.Header.Get("x-user")
+
+	//log to console
 	log.Println(string(body))
+	log.Println("X-USER: ", xUser_Header)
 
 }
