@@ -2,21 +2,33 @@ package golangweb
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
-func TestGetRequest(t *testing.T) {
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "HTTP Testing")
+}
 
-	mux := http.NewServeMux()
+var target = "http://localhost:1234/test-handler"
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Home page")
-		fmt.Fprintln(w, "METHOD: ", r.Method) // [GET,POST,PUT,PATCH,DELETE]
-		fmt.Fprintln(w, "URL: ", r.URL)       // url
+func TestHTTPTest(t *testing.T) {
 
-	})
+	//create http test
+	request := httptest.NewRequest("GET", target, nil)
+	recorder := httptest.NewRecorder()
 
-	http.ListenAndServe(":1234", mux)
+	//run test
+	testHandler(recorder, request)
+
+	//get response test
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+
+	//log  response test to console
+	log.Println(string(body))
 
 }
