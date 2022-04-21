@@ -1,19 +1,25 @@
 package golangweb
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 )
 
 func TestServerHTTP(t *testing.T) {
 
-	server := http.Server{
-		Addr: "localhost:1234",
+	var homeHandler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+		// w.Write([]byte("Home page.")) // manual
+		fmt.Fprint(w, "Home")
 	}
 
-	err := server.ListenAndServe()
-	if err != nil {
-		t.Error("Error: ", err.Error())
+	var aboutHandler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "About")
 	}
+
+	http.HandleFunc("/", homeHandler)
+	http.HandleFunc("/about", aboutHandler)
+
+	http.ListenAndServe(":1234", nil)
 
 }
