@@ -1,7 +1,6 @@
 package golangweb
 
 import (
-	"embed"
 	"io"
 	"log"
 	"net/http"
@@ -10,29 +9,32 @@ import (
 	"text/template"
 )
 
-//go:embed templates/*.html
-var templates embed.FS
-
-func testHandler_TemplateAction_With(w http.ResponseWriter, r *http.Request) {
-
-	t := template.Must(template.ParseFS(templates, "templates/*.html"))
+func testHandler_TemplateLayout(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles(
+		"./templates/header.html",
+		"./templates/main.html",
+		"./templates/content.html",
+		"./templates/footer.html",
+	))
 
 	t.ExecuteTemplate(w, "main.html", map[string]interface{}{
-		"Name": "Sandrian",
-		"Address": map[string]interface{}{
-			"Street": "Jl.Guru",
-			"City":   "Jambi",
+		"Title":  "Template layout",
+		"Header": "Hello World!",
+		"Items": []string{
+			"Item 1",
+			"Item 2",
+			"Item 3",
+			"Item 4",
 		},
 	})
-
 }
 
-func TestTemplateAction_With(t *testing.T) {
+func TestTemplateLayout(t *testing.T) {
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:1234/", nil)
 	recorder := httptest.NewRecorder()
 
-	testHandler_TemplateAction_With(recorder, request)
+	testHandler_TemplateLayout(recorder, request)
 
 	response := recorder.Result()
 	body, _ := io.ReadAll(response.Body)
