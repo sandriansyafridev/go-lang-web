@@ -8,10 +8,15 @@
 </head>
 <body>
 
-    {{ range $index,$element := .Items }}
-        <p> {{$element}}</p>
+    <h1>Name : {{.Name}}</h1>
+    
+    {{ with .Address }}
+        <ul>
+            <li>Street: {{.Street}}</li>
+            <li>City: {{.City}}</li>
+        </ul>
     {{ else }}
-        <p>No Item.</p>
+        <p>Not found address!</p>
     {{ end }}
    
 </body>
