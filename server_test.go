@@ -17,12 +17,18 @@ func testHandlerPostForm(w http.ResponseWriter, r *http.Request) {
 	name := r.PostFormValue("name")
 	email := r.PostFormValue("email")
 
-	fmt.Fprintln(w, "Name:", name)
-	fmt.Fprintln(w, "Email:", email)
+	if name != "" && email != "" {
+		fmt.Fprintln(w, "Name:", name)
+		fmt.Fprintln(w, "Email:", email)
+
+		w.WriteHeader(http.StatusOK)
+	}
+
+	w.WriteHeader(http.StatusUnprocessableEntity)
 
 }
 
-func TestPostForm(t *testing.T) {
+func TestPostFormValid(t *testing.T) {
 
 	bodyRequest := strings.NewReader("name=Sandrian Syafri&email=sandriansyafri@gmail.com")
 	request := httptest.NewRequest(http.MethodPost, target+"/users", bodyRequest)
@@ -36,5 +42,25 @@ func TestPostForm(t *testing.T) {
 	body, _ := io.ReadAll(response.Body)
 
 	log.Println(string(body))
+	log.Println("Status: ", response.Status)
+	log.Println("Status Code: ", response.StatusCode)
+
+}
+
+func TestPostFormInvalid(t *testing.T) {
+
+	request := httptest.NewRequest(http.MethodPost, target+"/users", nil)
+	request.Header.Add("content-type", "application/x-www-form-urlencoded")
+
+	recorder := httptest.NewRecorder()
+
+	testHandlerPostForm(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+
+	log.Println(string(body))
+	log.Println("Status: ", response.Status)
+	log.Println("Status Code: ", response.StatusCode)
 
 }
