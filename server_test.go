@@ -6,61 +6,73 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
 var target = "http://localhost:1234"
 
-func testHandlerPostForm(w http.ResponseWriter, r *http.Request) {
+func SetCookie(w http.ResponseWriter, r *http.Request) {
 
-	name := r.PostFormValue("name")
-	email := r.PostFormValue("email")
+	cookie := http.Cookie{}
+	cookie.Name = "x-com-user"
+	cookie.Value = "Sandrian Syafri"
+	cookie.Path = "/"
 
-	if name != "" && email != "" {
-		fmt.Fprintln(w, "Name:", name)
-		fmt.Fprintln(w, "Email:", email)
+	http.SetCookie(w, &cookie)
+	fmt.Fprint(w, "Cookie Created!")
+}
+func GetCookie(w http.ResponseWriter, r *http.Request) {
 
-		w.WriteHeader(http.StatusOK)
+	cookie, err := r.Cookie("x-com-user")
+	if err != nil {
+		fmt.Fprint(w, "No Cookie")
+	} else {
+		fmt.Fprintf(w, "Cookie %s: %s", cookie.Name, cookie.Value)
 	}
 
-	w.WriteHeader(http.StatusUnprocessableEntity)
+}
+
+func TestCookieOnBrowser(t *testing.T) {
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Home")
+	})
+	http.HandleFunc("/get-cookie", GetCookie)
+	http.HandleFunc("/set-cookie", SetCookie)
+
+	http.ListenAndServe(":1234", nil)
 
 }
 
-func TestPostFormValid(t *testing.T) {
+func TestSetCookie(t *testing.T) {
 
-	bodyRequest := strings.NewReader("name=Sandrian Syafri&email=sandriansyafri@gmail.com")
-	request := httptest.NewRequest(http.MethodPost, target+"/users", bodyRequest)
-	request.Header.Add("content-type", "application/x-www-form-urlencoded")
-
+	request := httptest.NewRequest(http.MethodGet, target+"/set-cookie", nil)
 	recorder := httptest.NewRecorder()
 
-	testHandlerPostForm(recorder, request)
+	SetCookie(recorder, request)
 
 	response := recorder.Result()
 	body, _ := io.ReadAll(response.Body)
 
 	log.Println(string(body))
-	log.Println("Status: ", response.Status)
-	log.Println("Status Code: ", response.StatusCode)
 
 }
 
-func TestPostFormInvalid(t *testing.T) {
+func TestGetCookie(t *testing.T) {
 
-	request := httptest.NewRequest(http.MethodPost, target+"/users", nil)
-	request.Header.Add("content-type", "application/x-www-form-urlencoded")
+	request := httptest.NewRequest(http.MethodGet, target+"/get-cookie", nil)
+	cookie := http.Cookie{}
+	cookie.Name = "x-com-user"
+	cookie.Value = "Sandrian"
 
+	request.AddCookie(&cookie)
 	recorder := httptest.NewRecorder()
 
-	testHandlerPostForm(recorder, request)
+	GetCookie(recorder, request)
 
 	response := recorder.Result()
 	body, _ := io.ReadAll(response.Body)
 
 	log.Println(string(body))
-	log.Println("Status: ", response.Status)
-	log.Println("Status Code: ", response.StatusCode)
 
 }
