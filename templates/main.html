@@ -8,7 +8,9 @@
 </head>
 <body>
 
-    <h1>{{.Header}}</h1>
+    {{ if .Header }}
+        <h1>{{ .Header }}</h1>
+    {{ end }}
 
     <ul>
         <li>City : {{.Adress.City}} </li>
