@@ -8,10 +8,10 @@
 </head>
 <body>
 
-    {{ if gt .Value 75 }}
-        <h1>Excellent</h1>
-    {{ else if le .Value 75 }}
-        <h1>Nice</h1>
+    {{ range $index,$element := .Items }}
+        <p> {{$element}}</p>
+    {{ else }}
+        <p>No Item.</p>
     {{ end }}
    
 </body>
