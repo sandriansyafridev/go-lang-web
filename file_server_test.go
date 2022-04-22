@@ -1,7 +1,7 @@
 package golangweb
 
 import (
-	"fmt"
+	"embed"
 	"html/template"
 	"io"
 	"log"
@@ -10,30 +10,17 @@ import (
 	"testing"
 )
 
-type Person struct {
-	Name string
-}
+var (
+	//go:embed templates/*.html
+	templates embed.FS
+	t         = template.Must(template.ParseFS(templates, "templates/*.html"))
+)
 
-func (p Person) SayHelloTo(name string) string {
-	str := fmt.Sprintf("Hello %s, my name is %s", name, p.Name)
-	return str
-}
-
-func testHandler_TemplateFunction(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.ParseFiles(
-		"./templates/main.html",
-		"./templates/header.html",
-		"./templates/content.html",
-		"./templates/footer.html",
-	))
-
+func testHandler_TemplateCache(w http.ResponseWriter, r *http.Request) {
 	data := map[string]interface{}{
-		"Title": "Function",
-		"Person": Person{
-			Name: "Sandrian",
-		},
+		"Title":  "Template Cache",
+		"Header": "Hello World!",
 	}
-
 	t.ExecuteTemplate(w, "main", data)
 }
 
@@ -42,7 +29,7 @@ func TestTemplateFunction(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:1234/test", nil)
 	recorder := httptest.NewRecorder()
 
-	testHandler_TemplateFunction(recorder, request)
+	testHandler_TemplateCache(recorder, request)
 
 	response := recorder.Result()
 	body, _ := io.ReadAll(response.Body)
