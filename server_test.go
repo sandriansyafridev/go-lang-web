@@ -6,65 +6,35 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
 var target = "http://localhost:1234"
 
-func testHandlerCreateHeader(w http.ResponseWriter, r *http.Request) {
+func testHandlerPostForm(w http.ResponseWriter, r *http.Request) {
 
-	contentType_Header := r.Header.Get("content-type")
-	fmt.Fprint(w, "Content-Type: ", contentType_Header)
+	name := r.PostFormValue("name")
+	email := r.PostFormValue("email")
 
-}
-
-func testHandlerGetHeader(w http.ResponseWriter, r *http.Request) {
-
-	w.Header().Add("x-user", "Sandrian Syafri")
-	fmt.Fprint(w, "TEST OK")
+	fmt.Fprintln(w, "Name:", name)
+	fmt.Fprintln(w, "Email:", email)
 
 }
 
-func TestCreateHeaderToServer(t *testing.T) {
+func TestPostForm(t *testing.T) {
 
-	//create http test
-	req := httptest.NewRequest(http.MethodGet, target, nil)
-	rec := httptest.NewRecorder()
+	bodyRequest := strings.NewReader("name=Sandrian Syafri&email=sandriansyafri@gmail.com")
+	request := httptest.NewRequest(http.MethodPost, target+"/users", bodyRequest)
+	request.Header.Add("content-type", "application/x-www-form-urlencoded")
 
-	//add header
-	req.Header.Add("content-type", "application/json")
+	recorder := httptest.NewRecorder()
 
-	//process testing
-	testHandlerCreateHeader(rec, req)
+	testHandlerPostForm(recorder, request)
 
-	//get response after test
-	res := rec.Result()
-	body, _ := io.ReadAll(res.Body)
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
 
-	//log to console
 	log.Println(string(body))
-
-}
-
-func TestGetHeaderFromClient(t *testing.T) {
-
-	//create http test
-	req := httptest.NewRequest(http.MethodGet, target, nil)
-	rec := httptest.NewRecorder()
-
-	//get header
-
-	//process testing
-	testHandlerGetHeader(rec, req)
-
-	//get response after test
-	res := rec.Result()
-	body, _ := io.ReadAll(res.Body)
-
-	xUser_Header := res.Header.Get("x-user")
-
-	//log to console
-	log.Println(string(body))
-	log.Println("X-USER: ", xUser_Header)
 
 }
