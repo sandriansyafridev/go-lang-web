@@ -21,7 +21,7 @@ func testHandler_Autoescape(w http.ResponseWriter, r *http.Request) {
 
 	data := map[string]interface{}{
 		"Title":  "Autoescape",
-		"Header": "<p>Test Ting</p>",
+		"Header": template.HTML("<p>Test Ting</p>"),
 	}
 	t.ExecuteTemplate(w, "index", data)
 
