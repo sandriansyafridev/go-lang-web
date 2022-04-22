@@ -8,14 +8,11 @@
 </head>
 <body>
 
-    {{ if .Header }}
-        <h1>{{ .Header }}</h1>
+    {{ if gt .Value 75 }}
+        <h1>Excellent</h1>
+    {{ else if le .Value 75 }}
+        <h1>Nice</h1>
     {{ end }}
-
-    <ul>
-        <li>City : {{.Adress.City}} </li>
-        <li>Address : {{.Adress.Street}} </li>
-    </ul>
-
+   
 </body>
 </html>

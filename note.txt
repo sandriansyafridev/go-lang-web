@@ -4,7 +4,7 @@ BesarDari           (gt) -> greather than
 BesarSama           (ge) -> greather equal
 
 KecilDari           (lt) -> less then
-KecilDari           (le) -> less equeal
+KecilSma            (le) -> less equeal
 
 Sama Dengan         (eq) -> equal
 Tidak Sama dengan   (ne) -> not equal
