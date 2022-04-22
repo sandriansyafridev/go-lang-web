@@ -9,20 +9,19 @@ import (
 	"text/template"
 )
 
-func testHandler_SimpleHTML_File(w http.ResponseWriter, r *http.Request) {
+func testHandler_SimpleHTML_Directory(w http.ResponseWriter, r *http.Request) {
 
-	t := template.Must(template.ParseFiles("./template/main.html"))
-
-	t.ExecuteTemplate(w, "main.html", "Hello World!")
+	t := template.Must(template.ParseGlob("./template/*.gohtml"))
+	t.ExecuteTemplate(w, "main.gohtml", "Hello")
 
 }
 
-func TestSimpleHTML_File(t *testing.T) {
+func TestSimpleHTML_Directory(t *testing.T) {
 
 	request := httptest.NewRequest(http.MethodGet, "http://localhost:1234/", nil)
 	recorder := httptest.NewRecorder()
 
-	testHandler_SimpleHTML_File(recorder, request)
+	testHandler_SimpleHTML_Directory(recorder, request)
 
 	response := recorder.Result()
 	body, _ := io.ReadAll(response.Body)
