@@ -17,7 +17,7 @@ func testHandler_TemplateLayout(w http.ResponseWriter, r *http.Request) {
 		"./templates/footer.html",
 	))
 
-	t.ExecuteTemplate(w, "main.html", map[string]interface{}{
+	t.ExecuteTemplate(w, "main", map[string]interface{}{
 		"Title":  "Template layout",
 		"Header": "Hello World!",
 		"Items": []string{

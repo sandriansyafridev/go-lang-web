@@ -1,5 +1,7 @@
-{{ template "header.html" . }}
-    
-{{ template "content.html". }}
-   
-{{ template "footer.html"  }}
+{{ define "main"  }}
+
+    {{ template "header" .  }}
+    {{ template "content" . }}
+    {{ template "footer"  }}
+
+{{ end }}

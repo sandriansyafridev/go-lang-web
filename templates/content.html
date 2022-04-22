@@ -1,7 +1,11 @@
+{{ define "content" }}
+
 <h1>{{ .Header }}</h1>
 
-{{ range $i,$e := .Items }}
-    <p>{{ $e }}</p>
-{{ else }}
-    <p>No items</p>
+    {{ range $i,$e := .Items }}
+        <p>{{ $e }}</p>
+    {{ else }}
+        <p>No items</p>
+    {{ end }}
+
 {{ end }}
