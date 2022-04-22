@@ -1,31 +1,32 @@
 package golangweb
 
 import (
-	"embed"
+	"io"
+	"log"
 	"net/http"
+	"net/http/httptest"
 	"testing"
+	"text/template"
 )
 
-//go:embed assets
-var assets embed.FS
+func testHandler_SimpleHTML_File(w http.ResponseWriter, r *http.Request) {
 
-func testHandlerServeFile(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("./template/main.html"))
 
-	name := r.URL.Query().Get("name")
-	switch {
-	case name != "":
-		http.ServeFile(w, r, "assets/index.html")
-	default:
-		http.ServeFile(w, r, "assets/not-found.html")
-	}
+	t.ExecuteTemplate(w, "main.html", "Hello World!")
 
 }
 
-func TestServeFile(t *testing.T) {
+func TestSimpleHTML_File(t *testing.T) {
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", testHandlerServeFile)
+	request := httptest.NewRequest(http.MethodGet, "http://localhost:1234/", nil)
+	recorder := httptest.NewRecorder()
 
-	http.ListenAndServe(":1234", mux)
+	testHandler_SimpleHTML_File(recorder, request)
+
+	response := recorder.Result()
+	body, _ := io.ReadAll(response.Body)
+
+	log.Println(string(body))
 
 }
