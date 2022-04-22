@@ -2,7 +2,6 @@ package golangweb
 
 import (
 	"embed"
-	"io/fs"
 	"net/http"
 	"testing"
 )
@@ -10,13 +9,23 @@ import (
 //go:embed assets
 var assets embed.FS
 
-func TestFileServer(t *testing.T) {
+func testHandlerServeFile(w http.ResponseWriter, r *http.Request) {
 
-	dir, _ := fs.Sub(assets, "assets")
-	fileServer := http.FileServer(http.FS(dir))
+	name := r.URL.Query().Get("name")
+	switch {
+	case name != "":
+		http.ServeFile(w, r, "assets/index.html")
+	default:
+		http.ServeFile(w, r, "assets/not-found.html")
+	}
+
+}
+
+func TestServeFile(t *testing.T) {
 
 	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static/", fileServer))
+	mux.HandleFunc("/", testHandlerServeFile)
 
 	http.ListenAndServe(":1234", mux)
+
 }
